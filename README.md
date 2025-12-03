@@ -1,145 +1,37 @@
-# Inventory Management
+# DICOM Sync Service
 
-A simple backend system to manage inventories and sales for small shop.
+A backend service for syncing DICOM studies from Orthanc to the database.
 
-## Functionality
+## Prerequisites
 
-### Inventory Management
+- Docker must be installed on your system
 
-- View inventory infomation
-- Insert new inventory
-- Add amount or change price
-- Remove inventory
+## Running the Server
 
-### Bill Management
+I've added a make script to easily run the project. Use the following commands:
 
-- View bill information
-- Create new bill
-- Process existing bill(with inventory update)
-- Delete bill
+### Start the server
 
-## Database Schema
-
-### Inventory Entity
-
-| Field                | Type     | Detail                                      |
-| -------------------- | -------- | ------------------------------------------- |
-| id                   | ObjectID | Inventory ID                                |
-| name                 | String   | Name of inventory                           |
-| price                | Float    | Current price of inventory                  |
-| amount               | Int      | Current amount of inventory                 |
-| last_incoming_amount | Int      | Inventory amount of most recently added     |
-| last_incoming_date   | DateTime | Time when inventory was most recently added |
-| last_outgoing_amount | Int      | Inventory amount of most recently sold      |
-| last_outgoing_date   | DateTime | Time when inventory was most recently sold  |
-| last_edited          | DateTime | Latest updated time                         |
-
-### Bill
-
-| Field       | Type     | Detail                                           |
-| ----------- | -------- | ------------------------------------------------ |
-| id          | ObjectID | Bill ID                                          |
-| items       | Item[]   | Items to buy for bill                            |
-| total_price | Float    | Total price for items                            |
-| status      | String   | Current status of bill (`Pending` or `Finished`) |
-| order_date  | DateTime | Bill creation time                               |
-| proc_date   | DateTime | Bill paid time                                   |
-
-- Item
-
-```
-{name: String, amount: Number}
+```bash
+make start
 ```
 
-## API Design
+This will build and start the Docker containers in detached mode.
 
-### Inventory Management API
+### Stop the server
 
-#### - View inventories
-
-Endpoint: `GET /inventory`
-
-#### - Insert new inventory
-
-Endpoint: `POST /inventory`
-
-Example Body:
-
-```json
-{
-  "name": "book",
-  "price": 10,
-  "amount": 200
-}
+```bash
+make stop
 ```
 
-#### - Add amount or change price
+This will stop and remove the Docker containers.
 
-Endpoint: `PATCH /inventory/:id`
+## API Endpoints
 
-Example Body:
+### DICOM Sync
 
-```json
-{
-  "amount": 50, // Amount to add
-  "price": 20 // Price to change
-}
-```
+- **POST** `/api/dicom-sync` - Syncs Orthanc study instance UIDs to the database
 
-#### - Remove inventory
+## Database
 
-Endpoint: `DELETE /inventory/:id`
-
-### Bill Management
-
-#### - View bill information
-
-Endpoint: `GET /bill`
-
-#### - Create new bill
-
-Endpoint: `POST /bill`
-
-Example Body:
-
-```json
-{
-  "items": [
-    {
-      "name": "bag",
-      "amount": 1
-    },
-    {
-      "name": "pen",
-      "amount": 2
-    },
-    {
-      "name": "cup",
-      "amount": 1
-    }
-  ]
-}
-```
-
-#### - Process existing bill
-
-Endpoint: `PATCH /bill/:id`
-
-#### - Delete bill
-
-Endpoint: `DELETE /bill/:id`
-
-## Running application
-
-The application is containerized and can run with docker.
-
-```shell
-docker-compose up --build
-```
-
-Or you can run with `yarn`. You should check the database configurations on environment.
-
-```shell
-yarn start
-```
-
+The service uses PostgreSQL database running in Docker. Prisma migrations are automatically applied when the container starts.
