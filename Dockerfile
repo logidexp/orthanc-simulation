@@ -17,4 +17,4 @@ COPY . .
 
 EXPOSE 4000
 
-CMD [ "yarn", "start" ]
+CMD npx prisma migrate deploy && yarn start
