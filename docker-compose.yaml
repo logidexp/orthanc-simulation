@@ -1,0 +1,24 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgres:14-alpine
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: 'postgres'
+      POSTGRES_PASSWORD: 12345678
+      POSTGRES_DB: 'mydb'
+
+  server:
+    build: .
+    environment:
+      SERBER_PORT: 4000
+      DATABASE_HOST: db
+      DATABASE_PORT: 5432
+      DATABASE_USERNAME: postgres
+      DATABASE_PASSWORD: 12345678
+      DATABASE_DBNAME: mydb
+    ports:
+      - "4000:4000"
